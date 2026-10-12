@@ -30,29 +30,45 @@ public class SuiteListener
                 suite.getName()
         );
 
-        String browsers =
-                suite.getXmlSuite()
-                        .getTests()
-                        .stream()
-                        .map(
-                                xmlTest ->
-                                        xmlTest.getParameter(
-                                                "browser"
-                                        )
-                        )
-                        .filter(
-                                Objects::nonNull
-                        )
-                        .filter(
-                                browser ->
-                                        !browser.isBlank()
-                        )
-                        .distinct()
-                        .collect(
-                                Collectors.joining(
-                                        ", "
-                                )
-                        );
+        String browserOverride =
+                System.getProperty(
+                        "browser"
+                );
+
+        String browsers;
+
+        if (browserOverride != null
+                && !browserOverride.isBlank()) {
+
+            browsers =
+                    browserOverride;
+
+        } else {
+
+            browsers =
+                    suite.getXmlSuite()
+                            .getTests()
+                            .stream()
+                            .map(
+                                    xmlTest ->
+                                            xmlTest.getParameter(
+                                                    "browser"
+                                            )
+                            )
+                            .filter(
+                                    Objects::nonNull
+                            )
+                            .filter(
+                                    browser ->
+                                            !browser.isBlank()
+                            )
+                            .distinct()
+                            .collect(
+                                    Collectors.joining(
+                                            ", "
+                                    )
+                            );
+        }
 
         if (browsers.isBlank()) {
 
