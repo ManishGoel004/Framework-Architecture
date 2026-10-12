@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+
+<suite name="Framework Suite">
+
+    <listeners>
+        <listener class-name="listeners.TestListener"/>
+        <listener class-name="listeners.SuiteListener"/>
+        <listener class-name="retry.RetryTransformer"/>
+    </listeners>
+
+    <test name="Application Tests">
+
+        <parameter
+                name="browser"
+                value="chrome"/>
+
+        <classes>
+            <class name="tests.LoginTests"/>
+            <class name="tests.CartTests"/>
+        </classes>
+
+    </test>
+
+</suite>
