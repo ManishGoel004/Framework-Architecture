@@ -10,6 +10,9 @@ on:
     branches:
       - main
 
+  schedule:
+    - cron: "30 2 * * *"
+
   workflow_dispatch:
 
     inputs:
@@ -43,13 +46,22 @@ on:
           - "false"
 
       suite:
-        description: "Test suite to execute"
+        description: "Execution suite"
         required: true
         default: "normal"
         type: choice
         options:
           - normal
           - cross-browser
+
+      test_scope:
+        description: "Tests to execute"
+        required: true
+        default: "smoke"
+        type: choice
+        options:
+          - smoke
+          - regression
 
 
 permissions:
@@ -62,7 +74,7 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    timeout-minutes: 30
+    timeout-minutes: 45
 
 
     steps:
@@ -87,56 +99,80 @@ jobs:
 
       - name: Resolve execution settings
         shell: bash
-        env:
-          INPUT_ENVIRONMENT: ${{ github.event.inputs.environment }}
-          INPUT_BROWSER: ${{ github.event.inputs.browser }}
-          INPUT_HEADLESS: ${{ github.event.inputs.headless }}
-          INPUT_SUITE: ${{ github.event.inputs.suite }}
 
         run: |
 
-          echo "TEST_ENV=${INPUT_ENVIRONMENT:-qa}" >> "$GITHUB_ENV"
+          echo "Triggered by: ${{ github.event_name }}"
 
-          echo "TEST_BROWSER=${INPUT_BROWSER:-chrome}" >> "$GITHUB_ENV"
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
 
-          echo "TEST_HEADLESS=${INPUT_HEADLESS:-true}" >> "$GITHUB_ENV"
+            echo "TEST_ENV=qa" >> "$GITHUB_ENV"
+            echo "TEST_BROWSER=chrome" >> "$GITHUB_ENV"
+            echo "TEST_HEADLESS=true" >> "$GITHUB_ENV"
+            echo "TEST_SUITE=normal" >> "$GITHUB_ENV"
+            echo "TEST_GROUPS=smoke" >> "$GITHUB_ENV"
 
-          echo "TEST_SUITE=${INPUT_SUITE:-normal}" >> "$GITHUB_ENV"
+          elif [ "${{ github.event_name }}" = "push" ]; then
+
+            echo "TEST_ENV=qa" >> "$GITHUB_ENV"
+            echo "TEST_BROWSER=chrome" >> "$GITHUB_ENV"
+            echo "TEST_HEADLESS=true" >> "$GITHUB_ENV"
+            echo "TEST_SUITE=normal" >> "$GITHUB_ENV"
+            echo "TEST_GROUPS=regression" >> "$GITHUB_ENV"
+
+          elif [ "${{ github.event_name }}" = "schedule" ]; then
+
+            echo "TEST_ENV=qa" >> "$GITHUB_ENV"
+            echo "TEST_BROWSER=chrome" >> "$GITHUB_ENV"
+            echo "TEST_HEADLESS=true" >> "$GITHUB_ENV"
+            echo "TEST_SUITE=cross-browser" >> "$GITHUB_ENV"
+            echo "TEST_GROUPS=regression" >> "$GITHUB_ENV"
+
+          else
+
+            echo "TEST_ENV=${{ inputs.environment }}" >> "$GITHUB_ENV"
+            echo "TEST_BROWSER=${{ inputs.browser }}" >> "$GITHUB_ENV"
+            echo "TEST_HEADLESS=${{ inputs.headless }}" >> "$GITHUB_ENV"
+            echo "TEST_SUITE=${{ inputs.suite }}" >> "$GITHUB_ENV"
+            echo "TEST_GROUPS=${{ inputs.test_scope }}" >> "$GITHUB_ENV"
+
+          fi
 
 
       - name: Show execution configuration
         run: |
 
           echo "Environment : $TEST_ENV"
-
           echo "Browser     : $TEST_BROWSER"
-
           echo "Headless    : $TEST_HEADLESS"
-
           echo "Suite       : $TEST_SUITE"
+          echo "Groups      : $TEST_GROUPS"
 
 
       - name: Run Selenium tests
         shell: bash
+
         run: |
 
           if [ "$TEST_SUITE" = "cross-browser" ]; then
 
-            echo "Running cross-browser suite"
+            echo "Running cross-browser execution"
 
             mvn --batch-mode clean test \
               -Denv="$TEST_ENV" \
               -Dheadless="$TEST_HEADLESS" \
+              -Dgroups="$TEST_GROUPS" \
               -DsuiteXmlFile=testng-crossbrowser.xml
 
           else
 
-            echo "Running single-browser suite"
+            echo "Running single-browser execution"
 
             mvn --batch-mode clean test \
               -Denv="$TEST_ENV" \
               -Dbrowser="$TEST_BROWSER" \
               -Dheadless="$TEST_HEADLESS" \
+              -Dgroups="$TEST_GROUPS" \
               -DsuiteXmlFile=testng.xml
 
           fi
