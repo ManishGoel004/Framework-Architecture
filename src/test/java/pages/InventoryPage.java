@@ -1,5 +1,6 @@
 package pages;
 
+import constants.TestConstants;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -18,7 +19,14 @@ public class InventoryPage extends BasePage {
 
         super(driver);
 
-        waitForVisibility(pageTitle);
+        waitForUrlContains(
+                TestConstants.INVENTORY_PATH
+        );
+
+        waitForText(
+                pageTitle,
+                TestConstants.PRODUCTS_PAGE_TITLE
+        );
     }
 
     public String getPageTitle() {

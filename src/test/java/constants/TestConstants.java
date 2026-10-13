@@ -19,4 +19,7 @@ public final class TestConstants {
 
     public static final String INVENTORY_PATH =
             "inventory.html";
+
+    public static final String CART_PATH =
+            "cart.html";
 }

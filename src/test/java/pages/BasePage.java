@@ -58,4 +58,28 @@ public class BasePage {
                 ExpectedConditions.visibilityOfElementLocated(locator)
         );
     }
+
+    protected void waitForUrlContains(
+            String partialUrl
+    ) {
+
+        wait.until(
+                ExpectedConditions.urlContains(
+                        partialUrl
+                )
+        );
+    }
+
+    protected void waitForText(
+            By locator,
+            String expectedText
+    ) {
+
+        wait.until(
+                ExpectedConditions.textToBe(
+                        locator,
+                        expectedText
+                )
+        );
+    }
 }

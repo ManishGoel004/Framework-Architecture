@@ -1,5 +1,6 @@
 package pages;
 
+import constants.TestConstants;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
@@ -15,7 +16,14 @@ public class CartPage extends BasePage {
 
         super(driver);
 
-        waitForVisibility(pageTitle);
+        waitForUrlContains(
+                TestConstants.CART_PATH
+        );
+
+        waitForText(
+                pageTitle,
+                TestConstants.CART_PAGE_TITLE
+        );
     }
 
     public String getPageTitle() {
