@@ -184,16 +184,26 @@ jobs:
           mvn --batch-mode allure:report
 
 
-      - name: Upload test execution artifacts
+      - name: Upload Allure HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ui-test-artifacts
+          name: allure-report-${{ github.run_number }}
+          if-no-files-found: error
+          retention-days: 7
+          path: |
+            target/site/allure-maven-plugin/index.html
+    
+
+      - name: Upload test execution evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-evidence-${{ github.run_number }}
           if-no-files-found: ignore
           retention-days: 7
           path: |
             target/surefire-reports/
             target/allure-results/
-            target/site/allure-maven-plugin/
             logs/
             screenshots/
