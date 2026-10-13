@@ -20,7 +20,7 @@ public class BaseTest
                     BaseTest.class
             );
 
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     @Parameters("browser")
     public void setUp(
             @Optional("chrome") String xmlBrowser

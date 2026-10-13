@@ -16,6 +16,10 @@ public class LoginTests extends BaseTest {
 
     @Test(
             testName = "Valid user can login successfully",
+            groups = {
+                    "smoke",
+                    "regression"
+            },
             dataProvider = "validLoginData",
             dataProviderClass = LoginTestData.class
     )
@@ -70,6 +74,7 @@ public class LoginTests extends BaseTest {
 
     @Test(
             testName = "Invalid user cannot login",
+            groups = "regression",
             dataProvider = "invalidLoginData",
             dataProviderClass = LoginTestData.class
     )

@@ -14,7 +14,11 @@ import pages.LoginPage;
 public class CartTests extends BaseTest {
 
     @Test(
-            testName = "Add Sauce Labs Backpack to cart"
+            testName = "Add Sauce Labs Backpack to cart",
+            groups = {
+                    "smoke",
+                    "regression"
+            }
     )
     @Story("Add Product To Cart")
     @Description(
